@@ -1,0 +1,6 @@
+# compiled objects
+*.o
+*.a
+
+# project output
+0x40Hues
