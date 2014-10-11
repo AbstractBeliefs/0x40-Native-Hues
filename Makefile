@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -std=c11 -c -Wall
-LDFLAGS = -l SDL2
+LDFLAGS = -lSDL2 -lSDL2_image
 SOURCES = main.c
 OBJECTS = $(SOURCES:.c=.o)
 EXECUTABLE = 0x40Hues

@@ -4,3 +4,6 @@
 
 # project output
 0x40Hues
+
+# Temp files
+*.swp
