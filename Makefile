@@ -1,8 +1,8 @@
 CC = gcc
-CFLAGS = -c -Wall
+CFLAGS = -std=c11 -c -Wall
 LDFLAGS = -l SDL2
 SOURCES = main.c
-OBJECTS = $(SOURCES:.cpp=.o)
+OBJECTS = $(SOURCES:.c=.o)
 EXECUTABLE = 0x40Hues
 
 all: $(SOURCES) $(EXECUTABLE)
@@ -10,7 +10,7 @@ all: $(SOURCES) $(EXECUTABLE)
 $(EXECUTABLE): $(OBJECTS) 
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
-.cpp.o:
+.c.o:
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:
