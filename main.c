@@ -7,39 +7,44 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-SDL_Surface* loadSurface(const char* path, SDL_PixelFormat* format){
-    SDL_Surface* finalSurface = NULL;
+SDL_Texture* loadTexture(const char* path, SDL_Renderer* renderer){
+    SDL_Texture* texture = NULL;
 
     SDL_Surface* temp = IMG_Load(path);
     if (temp == NULL){
         fprintf(stderr, "SDL_image load failed: %s\n", IMG_GetError());
         return NULL;
     }
+    SDL_SetColorKey(temp, SDL_TRUE, SDL_MapRGB(temp->format, 0,0,0));
 
-    finalSurface = SDL_ConvertSurface(temp, format, 0);
-    if (finalSurface == NULL){
-        fprintf(stderr, "SDL_image conversion failed: %s\n", SDL_GetError());
+    texture = SDL_CreateTextureFromSurface(renderer, temp);
+    if (texture == NULL){
+        fprintf(stderr, "SDL texture failed: %s\n", SDL_GetError());
         return NULL;
-    }
-    SDL_SetColorKey(finalSurface, SDL_TRUE, SDL_MapRGB(finalSurface->format, 0,0,0));
+    } 
 
     SDL_FreeSurface(temp);
-    return finalSurface;
+    return texture;
 }
 
 int main(int argc, char* argv[]){
     srand(time(NULL));
     SDL_Window* window = NULL;
-    SDL_Surface* screenSurf = NULL;
-    SDL_Surface* testImage = NULL;
+    SDL_Renderer* renderer = NULL;
+    SDL_Texture* texture = NULL;
 
     // Init sdl and check for validity
     if (SDL_Init(SDL_INIT_VIDEO) < 0){
         fprintf(stderr, "SDL initialisation failed: %s\n", SDL_GetError());
         return 1;
     }
+    // Init img and check for validity
+    if (IMG_Init(IMG_INIT_PNG) ^ IMG_INIT_PNG){
+        fprintf(stderr, "IMG initialisation failed: %s\n", IMG_GetError());
+        return 1;
+    }
 
-    // Window creation was a success
+    // Let's get a window
     window = SDL_CreateWindow(
         "0x40 Hues - Desktop Edition",
         SDL_WINDOWPOS_UNDEFINED,
@@ -53,14 +58,21 @@ int main(int argc, char* argv[]){
         return 1;
     }
 
-    // We have a valid window now. Lets load the surfaces for window and image
-    screenSurf = SDL_GetWindowSurface(window);
-    testImage = loadSurface("homura.png", screenSurf->format);
+    // We have a valid window now. Let's create a renderer.
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
+    if (renderer == NULL){
+        fprintf(stderr, "SDL renderer creation failed: %s\n", SDL_GetError());
+        SDL_Quit();
+        return 1;
+    }
 
-    // Now lets color and write
-    SDL_FillRect(screenSurf, 0, SDL_MapRGB(screenSurf->format, 0xC8, 0xA2, 0xC8)); // Lilac
-    SDL_BlitSurface(testImage, NULL, screenSurf, NULL);
-    SDL_UpdateWindowSurface(window);
+    // Load our texture
+    texture = loadTexture("homura.png", renderer);
+    if (texture == NULL){
+        fprintf(stderr, "Couldn't load texture");
+        SDL_Quit();
+        return 1;
+    }
 
     // Loop and handle events
     SDL_Event event;
@@ -72,7 +84,7 @@ int main(int argc, char* argv[]){
             }
             else if (event.type == SDL_KEYDOWN){
                 switch (event.key.keysym.sym) {
-                    case SDLK_q:
+                    case SDLK_ESCAPE:
                         running = false;
                         break;
                     default:
@@ -81,9 +93,17 @@ int main(int argc, char* argv[]){
             }
             else {}
         }
+        // Draw
+        SDL_RenderClear(renderer);
+        SDL_SetRenderDrawColor(renderer, 0xC8, 0xA2, 0xC8, 0xFF); //Lilac
+        SDL_RenderCopy(renderer, texture, NULL, NULL);
+        SDL_RenderPresent(renderer);
+
         SDL_Delay(30);  // About 30 FPS
     }
 
+    SDL_DestroyTexture(texture);
+    SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
     return 0;
