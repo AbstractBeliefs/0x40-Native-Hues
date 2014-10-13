@@ -32,6 +32,15 @@ int main(int argc, char* argv[]){
     SDL_Window* window = NULL;
     SDL_Renderer* renderer = NULL;
     SDL_Texture* texture = NULL;
+    time_t lastTime = NULL;
+    time_t thisTime = NULL;
+    uint8_t bg_r = 0; 
+    uint8_t bg_g = 0; 
+    uint8_t bg_b = 0; 
+
+    uint8_t fg_r = 0; 
+    uint8_t fg_g = 0; 
+    uint8_t fg_b = 0; 
 
     // Init sdl and check for validity
     if (SDL_Init(SDL_INIT_VIDEO) < 0){
@@ -93,9 +102,23 @@ int main(int argc, char* argv[]){
             }
             else {}
         }
+
+        time(&thisTime);
+        if (thisTime != lastTime){
+            lastTime = thisTime;
+            bg_r = rand()*255;
+            bg_g = rand()*255;
+            bg_b = rand()*255;
+
+            fg_r = rand()*255;
+            fg_g = rand()*255;
+            fg_b = rand()*255;
+        }
+
         // Draw
         SDL_RenderClear(renderer);
-        SDL_SetRenderDrawColor(renderer, 0xC8, 0xA2, 0xC8, 0xFF); //Lilac
+        SDL_SetRenderDrawColor(renderer, bg_r, bg_g, bg_b, 0xFF);
+        SDL_SetTextureColorMod(texture, fg_r, fg_g, fg_b);
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
 
