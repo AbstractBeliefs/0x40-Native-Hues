@@ -7,6 +7,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
+#include "colours.h"
+
 SDL_Texture* loadTexture(const char* path, SDL_Renderer* renderer){
     SDL_Texture* texture = NULL;
 
@@ -34,13 +36,7 @@ int main(int argc, char* argv[]){
     SDL_Texture* texture = NULL;
     time_t lastTime = NULL;
     time_t thisTime = NULL;
-    uint8_t bg_r = 0; 
-    uint8_t bg_g = 0; 
-    uint8_t bg_b = 0; 
-
-    uint8_t fg_r = 0; 
-    uint8_t fg_g = 0; 
-    uint8_t fg_b = 0; 
+    int hue = 0;
 
     // Init sdl and check for validity
     if (SDL_Init(SDL_INIT_VIDEO) < 0){
@@ -106,19 +102,12 @@ int main(int argc, char* argv[]){
         time(&thisTime);
         if (thisTime != lastTime){
             lastTime = thisTime;
-            bg_r = rand()*255;
-            bg_g = rand()*255;
-            bg_b = rand()*255;
-
-            fg_r = rand()*255;
-            fg_g = rand()*255;
-            fg_b = rand()*255;
+            hue = rand() % numColours;
         }
 
         // Draw
         SDL_RenderClear(renderer);
-        SDL_SetRenderDrawColor(renderer, bg_r, bg_g, bg_b, 0xFF);
-        SDL_SetTextureColorMod(texture, fg_r, fg_g, fg_b);
+        SDL_SetTextureColorMod(texture, colourValues[hue][0],colourValues[hue][1],colourValues[hue][2]);
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
 
