@@ -76,7 +76,7 @@ int main(int argc, char* argv[]){
     }
 
     // Load our texture
-    texture = loadTexture("homura.png", renderer);
+    texture = loadTexture("popura.png", renderer);
     if (texture == NULL){
         fprintf(stderr, "Couldn't load texture");
         SDL_Quit();
