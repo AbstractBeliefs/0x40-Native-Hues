@@ -10,11 +10,14 @@ all: $(SOURCES) $(EXECUTABLE)
 $(EXECUTABLE): $(OBJECTS) 
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
-.c.o:
+%.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:
-	rm -f 0x40Hues *.o
+	rm -f $(EXECUTABLE) *.o
 
 run: all
-	./0x40Hues
+	./$(EXECUTABLE)
+
+debug: CFLAGS += -ggdb
+debug: | clean all
